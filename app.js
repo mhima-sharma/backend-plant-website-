@@ -22,6 +22,7 @@ const cartRoutes = require('./routes/cart.routes');
 const messageRoutes = require('./routes/user');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const chatgptRoutes = require('./routes/chatRoutes');
 
 
 
@@ -32,6 +33,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api', orderRoutes);
+app.use('/api/ai', chatgptRoutes);
 // app.use('/api/payments', paymentRoutes);
 
 
