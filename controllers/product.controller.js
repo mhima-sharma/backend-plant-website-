@@ -2,19 +2,17 @@
 const db = require('../config/db');
 const path = require('path');
 
+// Create product
 exports.createProduct = (req, res) => {
   try {
     const { title, quantity, price, description } = req.body;
 
-    // Ensure files are uploaded
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'At least one image is required' });
     }
 
-    // Get filenames of uploaded images
     const imageFilenames = req.files.map(file => file.filename).join(',');
 
-    // SQL Insert
     const sql = `
       INSERT INTO products (title, quantity, price, description, images)
       VALUES (?, ?, ?, ?, ?)
@@ -38,35 +36,35 @@ exports.createProduct = (req, res) => {
   }
 };
 
-
-// exports.getAllProducts = (req, res) => {
-//   const sql = 'SELECT * FROM products';
-
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error('Error fetching products:', err);
-//       return res.status(500).json({ message: 'Error retrieving products', error: err });
-//     }
-
-//     res.status(200).json(results);
-//   });
-// };
-
-
+// Get all products
+// Get all products - FIXED for mysql2 promise client
 exports.getAllProducts = async (req, res) => {
+  console.log("product list api");
+  const sql = 'SELECT * FROM products';
+
   try {
-    const [products] = await db.query('SELECT * FROM products');
-    res.status(200).json(products);
+    // Run query using await
+    const [results] = await db.query(sql);
+    
+    console.log("Fetched products: ", results);
+    res.status(200).json(results);
   } catch (err) {
     console.error('Error fetching products:', err);
-    res.status(500).json({ message: 'Database error', error: err });
+    res.status(500).json({ message: 'Error retrieving products', error: err });
   }
-}
+};
+
+
+// Delete product
 
 
 
 
-// controllers/product.controller.js
+
+
+
+
+
 exports.deleteProduct = (req, res) => {
   const productId = req.params.id;
 
@@ -83,21 +81,22 @@ exports.deleteProduct = (req, res) => {
   });
 };
 
-
-// get product detail by id
+// Get product detail by id
 exports.getProductById = async (req, res) => {
   const productId = req.params.id;
 
-  try {
-    const [rows] = await db.query("SELECT * FROM products WHERE id = ?", [productId]);
+  const sql = 'SELECT * FROM products WHERE id = ?';
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: "Product not found" });
+  try {
+    const [results] = await db.query(sql, [productId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
     }
 
-    res.status(200).json(rows[0]);
-  } catch (error) {
-    console.error("Error fetching product:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(200).json(results[0]);
+  } catch (err) {
+    console.error('Error fetching product:', err);
+    res.status(500).json({ message: 'Error retrieving product', error: err });
   }
 };
