@@ -27,14 +27,17 @@ const chatgptRoutes = require('./routes/chatRoutes');
 
 
 
-// app.use('/api', require('./routes/user'));
+
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api', orderRoutes);
 app.use('/api/ai', chatgptRoutes);
-// app.use('/api/payments', paymentRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Backend API is working :white_check_mark:");
+});
 
 
 module.exports = app;
