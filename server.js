@@ -10,11 +10,11 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
 // Initialize Socket.IO
-const io = new Server(server, {
-  cors: { origin: '*' }
-});
-app.set('io', io); // optional if needed in app.js
-setupSocket(io);
+// const io = new Server(server, {
+//   cors: { origin: '*' }
+// });
+// app.set('io', io); // optional if needed in app.js
+// setupSocket(io);
 
 // ✅ Start the HTTP server, not just the Express app
 server.listen(PORT, () => {

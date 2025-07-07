@@ -5,6 +5,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
+const dotenv = require('dotenv');
+dotenv.config();
 
 // Middleware
 app.use(cors());
