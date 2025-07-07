@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+     "start": "dotenv -e .env.production -- node server.js",
+  "dev": "dotenv -e .env.development -- node server.js"
   },
   "keywords": [],
   "author": "",
@@ -21,5 +23,8 @@
     "mysql2": "^3.14.0",
     "razorpay": "^2.9.6",
     "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0"
   }
 }
