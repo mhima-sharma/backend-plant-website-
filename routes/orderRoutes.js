@@ -4,6 +4,7 @@ const orderController = require('../controllers/orderController');
 
 router.post('/orders', orderController.createOrder);
 router.post('/payments/update-status', orderController.updatePaymentStatus);
+router.post('/orders/update-stock', orderController.updateStock);
 
 
 

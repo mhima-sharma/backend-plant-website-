@@ -202,3 +202,32 @@ exports.updatePaymentStatus = async (req, res) => {
         res.status(500).json({ error: 'Payment status update failed' });
     }
 };
+
+// Add to orders.controller.js
+exports.updateStock = async (req, res) => {
+    const { txnid } = req.body;
+
+    try {
+        const [orderItems] = await db.query(`
+            SELECT oi.product_name, oi.quantity, p.id 
+            FROM order_items oi 
+            JOIN products p ON oi.product_name = p.title 
+            JOIN payments pay ON pay.order_id = oi.order_id 
+            WHERE pay.txnid = ?
+        `, [txnid]);
+
+        if (orderItems.length === 0) {
+            return res.status(404).json({ message: 'Order items not found for this transaction.' });
+        }
+
+        for (let item of orderItems) {
+            await db.query('UPDATE products SET quantity = quantity - ? WHERE id = ?', [item.quantity, item.id]);
+        }
+
+        return res.json({ message: 'Stock updated successfully.' });
+    } catch (error) {
+        console.error('Stock Update Error:', error.message);
+        return res.status(500).json({ error: 'Stock update failed.' });
+    }
+};
+
