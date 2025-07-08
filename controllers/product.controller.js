@@ -1,4 +1,3 @@
-// controllers/product.controller.js
 const db = require('../config/db');
 const path = require('path');
 
