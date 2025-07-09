@@ -3,21 +3,26 @@ const http = require('http');
 const dotenv = require('dotenv');
 const { Server } = require('socket.io');
 const setupSocket = require('./socket');
+const db = require('./config/db'); // 👈 import your DB connection
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
-// Initialize Socket.IO
-// const io = new Server(server, {
-//   cors: { origin: '*' }
-// });
-// app.set('io', io); // optional if needed in app.js
+// Optional: setup socket
+// const io = new Server(server, { cors: { origin: '*' } });
+// app.set('io', io);
 // setupSocket(io);
 
-// ✅ Start the HTTP server, not just the Express app
-server.listen(PORT, () => {
+// ✅ Start the server and test DB connection
+server.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`💡 MY SQL is connected`);
+
+  try {
+    const [rows] = await db.query('SELECT 1');
+    console.log('✅ MySQL (TiDB) connected:', rows);
+  } catch (err) {
+    console.error('❌ MySQL connection failed:', err.message);
+  }
 });
