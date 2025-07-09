@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const path = require('path');
+const cloudinary = require('../config/cloudinary');
 
 // Create product
 exports.createProduct = async (req, res) => {
@@ -10,34 +10,44 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ message: 'At least one image is required' });
     }
 
-    const imageFilenames = req.files.map(file => file.filename).join(',');
+    // Upload images to Cloudinary and get URLs
+    const uploadPromises = req.files.map(file => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ folder: 'products' }, (err, result) => {
+          if (err) reject(err);
+          else resolve(result.secure_url);
+        });
+        stream.end(file.buffer);
+      });
+    });
+
+    const imageUrls = await Promise.all(uploadPromises);
+    const imageUrlString = imageUrls.join(','); // Save as comma-separated string
 
     const sql = `
       INSERT INTO products (title, quantity, price, description, images)
       VALUES (?, ?, ?, ?, ?)
     `;
 
-    const [result] = await db.query(sql, [title, quantity, price, description, imageFilenames]);
+    const [result] = await db.query(sql, [title, quantity, price, description, imageUrlString]);
 
     return res.status(201).json({
       message: 'Product created successfully',
       productId: result.insertId,
+      imageUrls
     });
 
   } catch (error) {
-    console.error('Unexpected error:', error);
-    return res.status(500).json({ message: 'Unexpected server error', error });
+    console.error('Error creating product:', error);
+    return res.status(500).json({ message: 'Internal server error', error });
   }
 };
 
 // Get all products
 exports.getAllProducts = async (req, res) => {
-  console.log("product list api");
-  const sql = 'SELECT * FROM products';
-
   try {
+    const sql = 'SELECT * FROM products';
     const [results] = await db.query(sql);
-    console.log("Fetched products: ", results);
     res.status(200).json(results);
   } catch (err) {
     console.error('Error fetching products:', err);
@@ -45,13 +55,12 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-// Get product detail by id
+// Get product by ID
 exports.getProductById = async (req, res) => {
   const productId = req.params.id;
 
-  const sql = 'SELECT * FROM products WHERE id = ?';
-
   try {
+    const sql = 'SELECT * FROM products WHERE id = ?';
     const [results] = await db.query(sql, [productId]);
 
     if (results.length === 0) {
@@ -71,7 +80,6 @@ exports.updateProduct = async (req, res) => {
   const { title, quantity, price, description } = req.body;
 
   try {
-    // If images are provided in the request
     let updateFields = [];
     let updateValues = [];
 
@@ -95,10 +103,21 @@ exports.updateProduct = async (req, res) => {
       updateValues.push(description);
     }
 
+    // Upload new images if any
     if (req.files && req.files.length > 0) {
-      const imageFilenames = req.files.map(file => file.filename).join(',');
+      const uploadPromises = req.files.map(file => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream({ folder: 'products' }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result.secure_url);
+          });
+          stream.end(file.buffer);
+        });
+      });
+
+      const newImageUrls = await Promise.all(uploadPromises);
       updateFields.push('images = ?');
-      updateValues.push(imageFilenames);
+      updateValues.push(newImageUrls.join(','));
     }
 
     if (updateFields.length === 0) {
