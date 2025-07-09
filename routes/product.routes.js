@@ -1,16 +1,17 @@
-const express = require('express');
-const router = express.Router();
 const multer = require('multer');
+
+// ✅ Use memory storage for Cloudinary (required for Vercel)
+const storage = multer.memoryStorage();
+const upload = multer({ storage }); // No disk writes
+
+const router = require('express').Router();
 const productController = require('../controllers/product.controller');
 
-// Use memory storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
+// Routes
 router.post('/', upload.array('images', 5), productController.createProduct);
 router.get('/', productController.getAllProducts);
-router.put('/products/:id', upload.array('images'), productController.updateProduct);
-router.delete('/products/:id', productController.deleteProduct);
 router.get('/:id', productController.getProductById);
+router.put('/products/:id', upload.array('images', 5), productController.updateProduct);
+router.delete('/products/:id', productController.deleteProduct);
 
 module.exports = router;
