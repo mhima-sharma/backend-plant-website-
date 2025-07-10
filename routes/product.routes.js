@@ -2,22 +2,21 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const productController = require('../controllers/product.controller');
-const authMiddleware = require('../middlewares/authMiddleware'); // ✅ middleware to verify token
+const authMiddleware = require('../middlewares/authMiddleware');
 
-// ✅ MEMORY STORAGE — DO NOT use diskStorage on Vercel
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ✅ API Endpoints
+// ✅ ROUTES
 
 // Create product (authenticated)
 router.post('/', authMiddleware, upload.array('images', 5), productController.createProduct);
 
-// Get all products (public or admin)
-router.get('/', productController.getAllProducts);
+// Get only products created by the logged-in user (must come before '/:id')
+router.get('/my', authMiddleware, productController.getMyProducts);
 
-// Get only products created by the logged-in user
-router.get('/my', authMiddleware, productController.getMyProducts); // ✅ NEW
+// Get all products (public)
+router.get('/', productController.getAllProducts);
 
 // Get product by ID (public)
 router.get('/:id', productController.getProductById);
