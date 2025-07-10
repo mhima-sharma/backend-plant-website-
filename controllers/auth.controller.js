@@ -16,32 +16,32 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
-  console.log('Login request body:', req.body);
-  const { email, password } = req.body;
-  try {
-    const [user] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (user.length === 0) return res.status(400).json({ message: 'Invalid email or password' });
+// exports.login = async (req, res) => {
+//   console.log('Login request body:', req.body);
+//   const { email, password } = req.body;
+//   try {
+//     const [user] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+//     if (user.length === 0) return res.status(400).json({ message: 'Invalid email or password' });
 
-    const validPass = await bcrypt.compare(password, user[0].password);
-    if (!validPass) return res.status(400).json({ message: 'Invalid email or password' });
+//     const validPass = await bcrypt.compare(password, user[0].password);
+//     if (!validPass) return res.status(400).json({ message: 'Invalid email or password' });
 
-    const token = jwt.sign({ id: user[0].id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+//     const token = jwt.sign({ id: user[0].id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user: { // ✅ Added this block
-        id: user[0].id,
-        name: user[0].name,
-        email: user[0].email
-      }
-    });
-  } catch (err) {
-    console.error('Login Error:', err);
-    res.status(500).json({ message: 'Server error', error: err });
-  }
-};
+//     res.status(200).json({
+//       message: 'Login successful',
+//       token,
+//       user: { // ✅ Added this block
+//         id: user[0].id,
+//         name: user[0].name,
+//         email: user[0].email
+//       }
+//     });
+//   } catch (err) {
+//     console.error('Login Error:', err);
+//     res.status(500).json({ message: 'Server error', error: err });
+//   }
+// };
 
 // Admin Signup
 exports.adminSignup = async (req, res) => {
@@ -66,7 +66,34 @@ exports.adminSignup = async (req, res) => {
   }
 };
 
-// Admin Login
+
+// User Login (Updated)
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const [user] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (user.length === 0) return res.status(400).json({ message: 'Invalid email or password' });
+
+    const validPass = await bcrypt.compare(password, user[0].password);
+    if (!validPass) return res.status(400).json({ message: 'Invalid email or password' });
+
+    const token = jwt.sign({ id: user[0].id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user[0].id,
+        name: user[0].name,
+        email: user[0].email
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err });
+  }
+};
+
+// Admin Login (Updated)
 exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
 
