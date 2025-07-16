@@ -1,13 +1,13 @@
+// app.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const app = express();
 const dotenv = require('dotenv');
 dotenv.config();
 
-const app = express();
-
-// ✅ Updated CORS Configuration
+// ✅ CORS Configuration (minimal change)
 const allowedOrigins = ['https://plant-website-frontend-beryl.vercel.app'];
 
 app.use(cors({
@@ -21,7 +21,8 @@ app.use(cors({
   credentials: true
 }));
 
-app.options('*', cors()); // ✅ Allow preflight
+// ✅ Allow preflight requests (for POST/PUT/DELETE etc.)
+app.options('*', cors());
 
 // Middleware
 app.use(express.json());
@@ -37,26 +38,17 @@ const messageRoutes = require('./routes/user');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const chatgptRoutes = require('./routes/chatRoutes');
-const visitorRoutes = require('./routes/visitorRoutes');
-const { initVisitorTable } = require('./controllers/visitorController');
 
-app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api', orderRoutes);
 app.use('/api/ai', chatgptRoutes);
-app.use('/api/visitor', visitorRoutes);
 
+// Root Route
 app.get("/", (req, res) => {
-  res.send("🌱 Backend API is working ✅");
-});
-
-// Visitor counter init
-initVisitorTable().then(() => {
-  console.log('✅ Visitor counter table ready');
-}).catch((err) => {
-  console.error('❌ Failed to initialize visitor table:', err);
+  res.send("Backend API is working ✅");
 });
 
 module.exports = app;
