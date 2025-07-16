@@ -1,5 +1,4 @@
 // app.js
-
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -26,10 +25,6 @@ const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const chatgptRoutes = require('./routes/chatRoutes');
 
-
-
-
-
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
@@ -41,31 +36,4 @@ app.get("/", (req, res) => {
   res.send("Backend API is working :white_check_mark:");
 });
 
-
 module.exports = app;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
