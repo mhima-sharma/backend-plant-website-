@@ -1,4 +1,5 @@
 // app.js
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -7,27 +8,13 @@ const app = express();
 const dotenv = require('dotenv');
 dotenv.config();
 
-// ✅ CORS Configuration (minimal change)
-const allowedOrigins = ['https://plant-website-frontend-beryl.vercel.app'];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
-// ✅ Allow preflight requests (for POST/PUT/DELETE etc.)
-app.options('*', cors());
-
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -39,6 +26,10 @@ const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const chatgptRoutes = require('./routes/chatRoutes');
 
+
+
+
+
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
@@ -46,9 +37,35 @@ app.use('/api/messages', messageRoutes);
 app.use('/api', orderRoutes);
 app.use('/api/ai', chatgptRoutes);
 
-// Root Route
 app.get("/", (req, res) => {
-  res.send("Backend API is working ✅");
+  res.send("Backend API is working :white_check_mark:");
 });
 
+
 module.exports = app;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
