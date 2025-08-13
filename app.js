@@ -3,17 +3,33 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const app = express();
 const dotenv = require('dotenv');
 dotenv.config();
 
+const app = express();
+
+// ✅ Allow CORS for your frontend domain
+app.use(
+  cors({
+    origin: [
+      "https://plant-website-frontend-beryl.vercel.app", // Your frontend on Vercel
+      "http://localhost:4200" // Local dev frontend
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+  })
+);
+
+// ✅ Handle preflight requests for all routes
+app.options('*', cors());
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+// Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -33,7 +49,7 @@ app.use('/api', orderRoutes);
 app.use('/api/ai', chatgptRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Backend API is working :white_check_mark:");
+  res.send("Backend API is working ✅");
 });
 
 module.exports = app;
