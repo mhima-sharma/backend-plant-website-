@@ -8,28 +8,24 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Allow CORS for your frontend domain
-app.use(
-  cors({
-    origin: [
-      "https://plant-website-frontend-beryl.vercel.app", // Your frontend on Vercel
-      "http://localhost:4200" // Local dev frontend
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-  })
-);
+// ✅ Updated CORS configuration
+app.use(cors({
+  origin: [
+    'https://plant-website-frontend-beryl.vercel.app', // your frontend domain
+    'http://localhost:4200' // for local testing
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
-// ✅ Handle preflight requests for all routes
+// ✅ Ensure preflight requests are handled
 app.options('*', cors());
 
 // Middleware
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
