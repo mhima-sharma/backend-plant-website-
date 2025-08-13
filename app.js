@@ -24,6 +24,7 @@ const messageRoutes = require('./routes/user');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const chatgptRoutes = require('./routes/chatRoutes');
+const paidOrdersRoutes = require('./routes/paidOrders.routes');
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
@@ -31,6 +32,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api', orderRoutes);
 app.use('/api/ai', chatgptRoutes);
+app.use('/api', paidOrdersRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend API is working :white_check_mark:");
