@@ -1,7 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const { getPaidOrders } = require('../controllers/paidOrdersController');
+const pool = require('../config/db');
 
-router.get('/paid-orders', getPaidOrders);
-
-module.exports = router;
+const getPaidOrders = (req, res) => {
+  pool.query('SELECT * FROM paid_orders', (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+};
