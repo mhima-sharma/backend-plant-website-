@@ -6,7 +6,7 @@ const getPaidOrders = async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM paid_orders');
     res.json(rows);
   } catch (err) {
-    console.error('DB ERROR:', err.message); // logs exact error
+    console.error('DB ERROR:', err.message); 
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
